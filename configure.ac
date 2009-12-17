@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([xpyb],
-        1.1,
+        1.2,
         [xcb@lists.freedesktop.org])
 AC_CONFIG_SRCDIR([xpyb.pc.in])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
@@ -99,7 +99,7 @@ AC_ARG_ENABLE(xvmc, AS_HELP_STRING([--enable-xvmc], [Build XCB XvMC Extension (d
 AM_CONDITIONAL(BUILD_XVMC, [test "x$BUILD_XVMC" = xyes])
 
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile])
 AC_CONFIG_FILES([xpyb.pc])
 
 AC_OUTPUT
