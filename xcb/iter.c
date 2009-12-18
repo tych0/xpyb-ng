@@ -5,6 +5,8 @@
 /*
  * Helpers
  */
+PyObject *xpybExcept_base;
+
 
 static void
 xpybIter_err(xpybIter *self)
@@ -169,13 +171,17 @@ PyTypeObject xpybIter_type = {
 /*
  * Module init
  */
-int xpybIter_modinit(PyObject *m)
-{
-    if (PyType_Ready(&xpybIter_type) < 0)
-        return -1;
-    Py_INCREF(&xpybIter_type);
-    if (PyModule_AddObject(m, "Iterator", (PyObject *)&xpybIter_type) < 0)
-	return -1;
+void inititer(void){
+    PyObject *module, *common;
 
-    return 0;
+    module = Py_InitModule("iter", NULL);
+    if (PyType_Ready(&xpybIter_type) < 0)
+        return;
+    Py_INCREF(&xpybIter_type);
+    if (PyModule_AddObject(module, "Iterator", (PyObject *)&xpybIter_type) < 0)
+        return;
+    common = PyImport_ImportModule("xcb.common");
+    if (!common)
+        return;
+    xpybExcept_base = PyObject_GetAttrString(common, "Exception");
 }
