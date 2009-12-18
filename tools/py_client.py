@@ -4,6 +4,7 @@
 import getopt
 import sys
 import re
+import __main__
 
 # Jump to the bottom of this file for the main routine
 
@@ -25,13 +26,6 @@ _cardinal_types = {'CARD8':  'B', 'uint8_t': 'B',
                    'void': 'B',
                    'float': 'f',
                    'double' : 'd'}
-_pylines = []
-_pylevel = 0
-_ns = None
-
-_py_fmt_fmt = ''
-_py_fmt_size = 0
-_py_fmt_list = []
 
 def _py(fmt, *args):
     '''
@@ -102,7 +96,6 @@ def _py_flush_format():
 def py_open(self):
     '''
     Exported function that handles module open.
-    Opens the files and writes out the auto-generated comment, header file includes, etc.
     '''
     global _ns
     _ns = self.namespace
@@ -156,7 +149,8 @@ def py_close(self):
     Exported function that handles module close.
     Writes out all the stored content lines, then closes the file.
     '''
-    pyfile = open('%s.py' % _ns.header, 'w')
+    print 'xcb/%s.py' % _ns.header
+    pyfile = open('xcb/%s.py' % _ns.header, 'w')
     for list in _pylines:
         for line in list:
             pyfile.write(line)
@@ -571,30 +565,18 @@ def py_error(self, name):
 # Main routine starts here
 
 # Must create an "output" dictionary before any xcbgen imports.
-output = {'open'    : py_open,
-          'close'   : py_close,
-          'simple'  : py_simple,
-          'enum'    : py_enum,
-          'struct'  : py_struct,
-          'union'   : py_union,
-          'request' : py_request,
-          'event'   : py_event,
-          'error'   : py_error
-          }
+__main__.output = {
+    'open'    : py_open,
+    'close'   : py_close,
+    'simple'  : py_simple,
+    'enum'    : py_enum,
+    'struct'  : py_struct,
+    'union'   : py_union,
+    'request' : py_request,
+    'event'   : py_event,
+    'error'   : py_error
+}
 
-# Boilerplate below this point
-
-# Check for the argument that specifies path to the xcbgen python package.
-try:
-    opts, args = getopt.getopt(sys.argv[1:], 'p:')
-except getopt.GetoptError, err:
-    print str(err)
-    print 'Usage: py_client.py [-p path] file.xml'
-    sys.exit(1)
-
-for (opt, arg) in opts:
-    if opt == '-p':
-        sys.path.append(arg)
 
 # Import the module class
 try:
@@ -609,12 +591,21 @@ except ImportError:
     print ''
     raise
 
-# Parse the xml header
-module = Module(args[0], output)
 
-# Build type-registry and resolve type dependencies
-module.register()
-module.resolve()
+def build(fname):
+    global _pylines, _pylevel, _ns, _py_fmt_fmt, _py_fmt_size, _py_fmt_list
+    _pylines = []
+    _pylevel = 0
+    _ns = None
 
-# Output the code
-module.generate()
+    _py_fmt_fmt = ''
+    _py_fmt_size = 0
+    _py_fmt_list = []
+
+    # Parse the xml header
+    module = Module(fname, __main__.output)
+    # Build type-registry and resolve type dependencies
+    module.register()
+    module.resolve()
+    # Output the code
+    module.generate()
