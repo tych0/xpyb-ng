@@ -25,6 +25,24 @@ class uIter(libpry.AutoTree):
         libpry.raises("too few items", list, i)
 
 
+class uFlatten(libpry.AutoTree):
+    def test_simple(self):
+        l = [1, 2, 3]
+        assert list(iter.flatten(l)) == l
+
+        l = [[1, 2], 3]
+        assert list(iter.flatten(l)) == [1, 2, 3]
+
+        l = [[1, [2]], 3]
+        assert list(iter.flatten(l)) == [1, 2, 3]
+
+        l = [["one", [2]], 3]
+        assert list(iter.flatten(l)) == ["one", 2, 3]
+
+
+
+
 tests = [
+    uFlatten(),
     uIter(),
 ]
