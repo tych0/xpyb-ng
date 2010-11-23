@@ -5,7 +5,7 @@ from tools import py_client
 
 CFLAGS=["-Wall"]
 # We'll write code to detect this properly later
-XCB_PATH="/usr/local/share/xcb"
+XCB_PATH="/usr/share/xcb"
 
 xmlfiles = [
     "bigreq", "composite", "damage", "dpms", "glx",
@@ -20,16 +20,14 @@ extensions = [
     "protobj", "reply", "request", "response", "struct",
     "union", "void"
 ]
-ext_modules = []
-for i in extensions:
-    ext_modules.append(
-        Extension(
-            "xcb.%s"%i,
-            sources = ["xcb/%s.c"%i],
-            libraries = ["xcb"],
-            extra_compile_args=CFLAGS
-        )
+ext_modules = [
+    Extension(
+        "xcb.xcb",
+        sources = ["xcb/%s.c" % i for i in extensions],
+        libraries = ["xcb"],
+        extra_compile_args=CFLAGS
     )
+]
 
 
 class build_ext(_build_ext):
@@ -41,6 +39,7 @@ class build_ext(_build_ext):
 
 setup(
     name = 'xpyb',
+    version = "1.3",
     ext_modules = ext_modules,
     packages = ["xcb"],
     cmdclass = {
