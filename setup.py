@@ -16,7 +16,7 @@ xmlfiles = [
 ]
 extensions = [
     "conn", "constant", "cookie", "error", "event",
-    "except", "ext", "extkey", "iter", "list", "module",
+    "except", "ext", "extkey", "list", "module",
     "protobj", "reply", "request", "response", "struct",
     "union", "void"
 ]
