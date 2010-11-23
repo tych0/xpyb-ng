@@ -4,7 +4,6 @@
 #include "constant.h"
 #include "cookie.h"
 #include "protobj.h"
-#include "response.h"
 #include "event.h"
 #include "error.h"
 #include "reply.h"
@@ -273,8 +272,6 @@ initxcb(void)
 	return;
 
     if (xpybProtobj_modinit(m) < 0)
-	return;
-    if (xpybResponse_modinit(m) < 0)
 	return;
     if (xpybEvent_modinit(m) < 0)
 	return;

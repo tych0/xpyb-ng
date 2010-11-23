@@ -108,7 +108,7 @@ xpybExt_send_request(xpybExt *self, PyObject *args, PyObject *kw)
 	return NULL;
 
     if (!request->is_void)
-	if (reply == NULL || !PyType_IsSubtype(reply, &xpybReply_type)) {
+	if (reply == NULL || !PyType_IsSubtype(reply, xpybReply_type)) {
 	    PyErr_SetString(xpybExcept_base, "Reply type missing or not derived from xcb.Reply.");
 	    return NULL;
 	}
