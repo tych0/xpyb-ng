@@ -1,24 +1,23 @@
-About xpyb
-============
+About xpyb-ng
+=============
 
-xpyb provides a Python binding to the X Window System protocol via libxcb.
+xpyb-ng is a fork of the xpyb project, which provides Python bindings to the X
+Window System protocol via libxcb.
 
 
-Please report any issues you find to the freedesktop.org bug tracker,
-at:
+Development
+===========
 
-	<https://bugs.freedesktop.org/enter_bug.cgi?product=XCB>
+The xpyb-ng project lives here:
 
-Discussion about XCB occurs on the XCB mailing list:
+    https://github.com/dequis/xpyb-ng
 
-        <mailto:xcb at lists.freedesktop.org>
-        <http://lists.freedesktop.org/mailman/listinfo/xcb>
+You can obtain the source for xpyb-ng using Git:
+    
+    git clone https://github.com/dequis/xpyb-ng.git
 
-You can obtain the latest development versions of xpyb using GIT.
-For anonymous checkouts, use:
+Please report bugs and issues here:
 
-        git clone git://anongit.freedesktop.org/git/xcb/xpyb
+    https://github.com/dequis/xpyb-ng/issues
 
-For developers, use:
 
-        git clone git+ssh://git.freedesktop.org/git/xcb/xpyb
