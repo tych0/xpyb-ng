@@ -4,8 +4,18 @@ from distutils.command.build_ext import build_ext as _build_ext
 from tools import py_client
 
 CFLAGS=["-Wall"]
-# We'll write code to detect this properly later
-XCB_PATH="/usr/share/xcb"
+
+XCB_PATHS = [
+    "/usr/share/xcb",
+    "/usr/local/share/xcb",
+]
+
+def find_xcb():
+    for i in XCB_PATHS:
+        if os.path.isdir(i):
+            return i
+    raise ValueError("Could not detect xcb protocol definition location...")
+
 
 xmlfiles = [
     "bigreq", "composite", "damage", "dpms", "glx",
@@ -33,7 +43,7 @@ ext_modules = [
 class build_ext(_build_ext):
     def run(self):
         for i in xmlfiles:
-            py_client.build(os.path.join(XCB_PATH, "%s.xml"%i))
+            py_client.build(os.path.join(find_xcb(), "%s.xml"%i))
         return _build_ext.run(self)
 
 
