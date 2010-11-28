@@ -25,10 +25,9 @@ xmlfiles = [
     "xtest", "xvmc", "xv"
 ]
 extensions = [
-    "conn", "constant", "cookie", "error", "event",
+    "conn", "constant", "cookie",
     "except", "ext", "extkey", "list", "module",
-    "protobj", "reply", "request", "struct",
-    "union", "void"
+    "protobj", "void"
 ]
 ext_modules = [
     Extension(

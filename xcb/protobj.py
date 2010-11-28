@@ -1,6 +1,23 @@
 import xcb
 import struct
 
+__all__ = ['Struct', 'Union', 'Request', 'Response', 'Event', 'Reply', 'Error']
+
+class Struct(xcb.Protobj):
+    """XCB generic struct object"""
+    pass
+
+class Union(xcb.Protobj):
+    """XCB generic union object"""
+    pass
+
+class Request(xcb.Protobj):
+    def __init__(self, buffer, opcode, void, checked):
+        xcb.Protobj.__init__(self, buffer)
+        self.opcode = opcode
+        self.is_void = void
+        self.is_checked = checked
+
 class Response(xcb.Protobj):
     """XCB generic response object"""
     def __init__(self, parent):

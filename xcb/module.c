@@ -4,12 +4,6 @@
 #include "constant.h"
 #include "cookie.h"
 #include "protobj.h"
-#include "event.h"
-#include "error.h"
-#include "reply.h"
-#include "request.h"
-#include "struct.h"
-#include "union.h"
 #include "list.h"
 #include "conn.h"
 #include "extkey.h"
@@ -111,7 +105,7 @@ xpyb_add_core(PyObject *self, PyObject *args)
 	PyErr_SetString(xpybExcept_base, "Extension type not derived from xcb.Extension.");
 	return NULL;
     }
-    if (!PyType_IsSubtype(setup, &xpybStruct_type)) {
+    if (!PyType_IsSubtype(setup, xpybStruct_type)) {
 	PyErr_SetString(xpybExcept_base, "Setup type not derived from xcb.Struct.");
 	return NULL;
     }
@@ -272,18 +266,6 @@ initxcb(void)
 	return;
 
     if (xpybProtobj_modinit(m) < 0)
-	return;
-    if (xpybEvent_modinit(m) < 0)
-	return;
-    if (xpybError_modinit(m) < 0)
-	return;
-    if (xpybReply_modinit(m) < 0)
-	return;
-    if (xpybRequest_modinit(m) < 0)
-	return;
-    if (xpybStruct_modinit(m) < 0)
-	return;
-    if (xpybUnion_modinit(m) < 0)
 	return;
 
     if (xpybList_modinit(m) < 0)

@@ -1,8 +1,6 @@
 #include "module.h"
 #include "except.h"
 #include "cookie.h"
-#include "event.h"
-#include "error.h"
 #include "extkey.h"
 #include "ext.h"
 #include "conn.h"

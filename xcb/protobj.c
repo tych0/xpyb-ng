@@ -2,6 +2,82 @@
 #include "except.h"
 #include "protobj.h"
 
+/*
+ * Helpers
+ */
+
+int
+xpybRequest_get_attributes(PyObject *request, int *is_void, int *opcode, int *is_checked)
+{
+    PyObject *tmp;
+
+    if (is_void != NULL) {
+        tmp = PyObject_GetAttrString(request, "is_void");
+        *is_void = PyObject_IsTrue(tmp);
+        Py_XDECREF(tmp);
+    }
+
+    if (opcode != NULL) {
+        tmp = PyObject_GetAttrString(request, "opcode");
+        *opcode = (int) PyInt_AsLong(tmp);
+        Py_XDECREF(tmp);
+    }
+
+    if (is_checked != NULL) {
+        tmp = PyObject_GetAttrString(request, "is_checked");
+        *is_checked = PyObject_IsTrue(tmp);
+        Py_XDECREF(tmp);
+    }
+    return 0;
+}
+
+int
+xpybError_set(xpybConn *conn, xcb_generic_error_t *e)
+{
+    unsigned char opcode;
+    PyObject *shim, *error, *type, *except;
+
+    type = (PyObject *)xpybError_type;
+    except = xpybExcept_proto;
+
+    if (e) {
+	opcode = e->error_code;
+	if (opcode < conn->errors_len && conn->errors[opcode] != NULL) {
+	    type = PyTuple_GET_ITEM(conn->errors[opcode], 0);
+	    except = PyTuple_GET_ITEM(conn->errors[opcode], 1);
+	}
+
+	shim = PyBuffer_FromMemory(e, sizeof(*e));
+	if (shim == NULL)
+	    return 1;
+
+	error = PyObject_CallFunctionObjArgs(type, shim, NULL);
+	if (error != NULL)
+	    PyErr_SetObject(except, error);
+	Py_DECREF(shim);
+	return 1;
+    }
+    return 0;
+}
+
+PyObject *
+xpybEvent_create(xpybConn *conn, xcb_generic_event_t *e)
+{
+    unsigned char opcode = e->response_type;
+    PyObject *shim, *event, *type = (PyObject *)xpybEvent_type;
+
+    if (opcode < conn->events_len && conn->events[opcode] != NULL)
+	type = conn->events[opcode];
+
+    shim = PyBuffer_FromMemory(e, sizeof(*e));
+    if (shim == NULL)
+	return NULL;
+
+    event = PyObject_CallFunctionObjArgs(type, shim, NULL);
+    Py_DECREF(shim);
+    return event;
+}
+
 
 /*
  * Infrastructure
@@ -164,6 +240,11 @@ PyTypeObject xpybProtobj_type = {
     .tp_as_sequence = &xpybProtobj_seqops
 };
 
+PyTypeObject *xpybError_type;
+PyTypeObject *xpybEvent_type;
+PyTypeObject *xpybReply_type;
+PyTypeObject *xpybRequest_type;
+PyTypeObject *xpybStruct_type;
 
 /*
  * Module init
@@ -174,7 +255,22 @@ int xpybProtobj_modinit(PyObject *m)
         return -1;
     Py_INCREF(&xpybProtobj_type);
     if (PyModule_AddObject(m, "Protobj", (PyObject *)&xpybProtobj_type) < 0)
-	return -1;
+        return -1;
+
+    PyObject *module = PyImport_ImportModule("xcb.protobj");
+    if (!module)
+        return -1;
+
+    xpybError_type = (PyTypeObject *) PyObject_GetAttrString(module, "Error");
+    xpybEvent_type = (PyTypeObject *) PyObject_GetAttrString(module, "Event");
+    xpybReply_type = (PyTypeObject *) PyObject_GetAttrString(module, "Reply");
+    xpybRequest_type = (PyTypeObject *) PyObject_GetAttrString(module, "Request");
+    xpybStruct_type = (PyTypeObject *) PyObject_GetAttrString(module, "Struct");
+    Py_INCREF(xpybError_type);
+    Py_INCREF(xpybEvent_type);
+    Py_INCREF(xpybReply_type);
+    Py_INCREF(xpybRequest_type);
+    Py_INCREF(xpybStruct_type);
 
     return 0;
 }

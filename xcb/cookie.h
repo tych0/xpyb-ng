@@ -2,13 +2,12 @@
 #define XPYB_COOKIE_H
 
 #include "conn.h"
-#include "request.h"
-#include "reply.h"
+#include "protobj.h"
 
 typedef struct {
     PyObject_HEAD
     xpybConn *conn;
-    xpybRequest *request;
+    PyObject *request;
     PyTypeObject *reply_type;
     xcb_void_cookie_t cookie;
 } xpybCookie;

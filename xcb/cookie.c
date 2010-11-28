@@ -2,8 +2,7 @@
 #include "except.h"
 #include "conn.h"
 #include "cookie.h"
-#include "error.h"
-#include "reply.h"
+#include "protobj.h"
 
 /*
  * Helpers
@@ -46,8 +45,11 @@ static PyObject *
 xpybCookie_check(xpybCookie *self, PyObject *args)
 {
     xcb_generic_error_t *error;
+    int is_void, is_checked;
 
-    if (!(self->request->is_void && self->request->is_checked)) {
+    xpybRequest_get_attributes(self->request, &is_void, NULL, &is_checked);
+
+    if (!(is_void && is_checked)) {
 	PyErr_SetString(xpybExcept_base, "Request is not void and checked.");
 	return NULL;
     }
@@ -67,9 +69,12 @@ xpybCookie_reply(xpybCookie *self, PyObject *args)
     xcb_generic_error_t *error;
     xcb_generic_reply_t *data;
     PyObject *shim, *reply;
+    int is_void;
+
+    xpybRequest_get_attributes(self->request, &is_void, NULL, NULL);
 
     /* Check arguments and connection. */
-    if (self->request->is_void) {
+    if (is_void) {
 	PyErr_SetString(xpybExcept_base, "Request has no reply.");
 	return NULL;
     }

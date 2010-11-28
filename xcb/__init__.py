@@ -1,8 +1,13 @@
 from xcb import *
 from iter import Iterator
-from response import Response, Event, Reply, Error
+from protobj import *
+
+xcb.Struct = Struct
+xcb.Union = Union
+xcb.Request = Request
+xcb.Response = Response
 xcb.Event = Event
-xcb.Error = Error
 xcb.Reply = Reply
+xcb.Error = Error
 
 __all__ = [ 'xproto', 'bigreq', 'xc_misc' ]

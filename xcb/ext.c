@@ -4,8 +4,7 @@
 #include "ext.h"
 #include "conn.h"
 #include "cookie.h"
-#include "reply.h"
-#include "request.h"
+#include "protobj.h"
 
 /*
  * Helpers
@@ -90,7 +89,7 @@ static PyObject *
 xpybExt_send_request(xpybExt *self, PyObject *args, PyObject *kw)
 {
     static char *kwlist[] = { "request", "cookie", "reply", NULL };
-    xpybRequest *request;
+    PyObject *request;
     xpybCookie *cookie;
     PyTypeObject *reply = NULL;
     xcb_protocol_request_t xcb_req;
@@ -99,15 +98,18 @@ xpybExt_send_request(xpybExt *self, PyObject *args, PyObject *kw)
     int flags;
     const void *data;
     Py_ssize_t size;
+    int is_void, opcode, is_checked;
 
     /* Parse and check arguments */
     if (!PyArg_ParseTupleAndKeywords(args, kw, "O!O!|O!", kwlist,
-				     &xpybRequest_type, &request,
-				     &xpybCookie_type, &cookie,
-				     &PyType_Type, &reply))
+                                     xpybRequest_type, &request,
+                                     &xpybCookie_type, &cookie,
+                                     &PyType_Type, &reply))
 	return NULL;
 
-    if (!request->is_void)
+    xpybRequest_get_attributes(request, &is_void, &opcode, &is_checked);
+
+    if (!is_void)
 	if (reply == NULL || !PyType_IsSubtype(reply, xpybReply_type)) {
 	    PyErr_SetString(xpybExcept_base, "Reply type missing or not derived from xcb.Reply.");
 	    return NULL;
@@ -116,8 +118,8 @@ xpybExt_send_request(xpybExt *self, PyObject *args, PyObject *kw)
     /* Set up request structure */
     xcb_req.count = 2;
     xcb_req.ext = (self->key != (xpybExtkey *)Py_None) ? &self->key->key : 0;
-    xcb_req.opcode = request->opcode;
-    xcb_req.isvoid = request->is_void;
+    xcb_req.opcode = opcode;
+    xcb_req.isvoid = is_void;
 
     /* Allocate and fill in data strings */
     if (PyObject_AsReadBuffer(((xpybProtobj *)request)->buf, &data, &size) < 0)
@@ -128,7 +130,7 @@ xpybExt_send_request(xpybExt *self, PyObject *args, PyObject *kw)
     xcb_parts[3].iov_len = -xcb_parts[2].iov_len & 3;
 
     /* Make request call */
-    flags = request->is_checked ? XCB_REQUEST_CHECKED : 0;
+    flags = is_checked ? XCB_REQUEST_CHECKED : 0;
     seq = xcb_send_request(self->conn->conn, flags, xcb_parts + 2, &xcb_req);
 
     /* Set up cookie */
