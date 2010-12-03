@@ -4,6 +4,7 @@ from protobj import *
 
 xcb.Struct = Struct
 xcb.Union = Union
+xcb.Iterator = Iterator
 xcb.Request = Request
 xcb.Response = Response
 xcb.Event = Event
