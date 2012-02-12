@@ -49,6 +49,9 @@ class build_ext(_build_ext):
             py_client.build(os.path.join(find_xcb(), "%s.xml"%i))
         return _build_ext.run(self)
 
+### XXX: The following is a hack. py2cairo looks for xpyb.pc when configuring.
+### However (as near as I can find) there is no way to get it to install with
+### distutils, so we fake it here.
 # make xpyb.pc file
 class PCOpt(object):
     def __init__(self, replace_str, val):
@@ -56,8 +59,17 @@ class PCOpt(object):
         self.val = val
 
 def gen_pc():
+    # --root is provided when doing maintainer type things, so set the prefix
+    # to local in that case, or /usr/local when doing normal things.
+    if any(map(lambda a: a.startswith('--root'), sys.argv)):
+        prefix = '/usr'
+    else:
+        prefix = '/usr/local'
+
+    prefix_opt = PCOpt('@prefix@', '/usr/local')
     pc_opts = {
-        '--prefix': PCOpt('@prefix@', '/usr/local'),
+        '--root': PCOpt('@root@', ''),
+        '--prefix': PCOpt('@prefix@', '${root}' + prefix),
         '--exec-prefix': PCOpt('@exec_prefix@', '${prefix}'),
         '--install-lib': PCOpt('@libdir@', '${exec_prefix}/lib'),
         '--install-headers': PCOpt('@includedir@', '${prefix}/include/python2.7/xpyb'),
@@ -72,7 +84,7 @@ def gen_pc():
                 except IndexError:
                     pass
     for arg in sys.argv:
-        override_arg(arg)        
+        override_arg(arg)
 
     with open('xpyb.pc.in') as in_:
         pc = in_.read()
@@ -84,7 +96,7 @@ def gen_pc():
     # if we're not installing, don't install the .pc
     if 'install' not in sys.argv:
         return
-    
+
     def resolve(path):
         """ Resolve a path through pkgconfig variables. """
         for opt in pc_opts.values():
