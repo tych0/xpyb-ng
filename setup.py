@@ -61,15 +61,18 @@ class PCOpt(object):
 def gen_pc():
     # --root is provided when doing maintainer type things, so set the prefix
     # to local in that case, or /usr/local when doing normal things.
-    if any(map(lambda a: a.startswith('--root'), sys.argv)):
+    rootarg = filter(lambda a: a.startswith('--root'), sys.argv)
+    try:
+        rootarg = rootarg[0].split('=')[1]
+    except IndexError:
+        rootarg = None
+    if rootarg:
         prefix = '/usr'
     else:
         prefix = '/usr/local'
 
-    prefix_opt = PCOpt('@prefix@', '/usr/local')
     pc_opts = {
-        '--root': PCOpt('@root@', ''),
-        '--prefix': PCOpt('@prefix@', '${root}' + prefix),
+        '--prefix': PCOpt('@prefix@', prefix),
         '--exec-prefix': PCOpt('@exec_prefix@', '${prefix}'),
         '--install-lib': PCOpt('@libdir@', '${exec_prefix}/lib'),
         '--install-headers': PCOpt('@includedir@', '${prefix}/include/python2.7/xpyb'),
@@ -106,7 +109,9 @@ def gen_pc():
                 path = resolve(path)
         return path
 
-    pkgconfig = os.path.join(resolve(pc_opts['--install-lib'].val), 'pkgconfig')
+    # XXX: moar haxxx: here we strip off the leading slash to keep join() happy
+    install_path = resolve(pc_opts['--install-lib'].val).strip('/')
+    pkgconfig = os.path.join(rootarg, install_path, 'pkgconfig')
     try:
         os.makedirs(pkgconfig)
     except OSError as e:
