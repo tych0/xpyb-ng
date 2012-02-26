@@ -65,7 +65,7 @@ def gen_pc():
     try:
         rootarg = rootarg[0].split('=')[1]
     except IndexError:
-        rootarg = None
+        rootarg = ''
     if rootarg:
         prefix = '/usr'
     else:
