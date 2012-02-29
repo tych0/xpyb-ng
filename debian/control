@@ -1,4 +1,4 @@
-Source: python-xpybng
+Source: xpyb-ng
 Section: universe/python
 Priority: optional
 Maintainer: Tycho Andersen <tycho@tycho.ws>
@@ -6,7 +6,6 @@ Build-Depends: debhelper (>= 8.0.0), libxcb1-dev, python-dev, python-xcbgen, xcb
 Standards-Version: 3.9.2
 Homepage: <http://github.com/tych0/xpyb-ng>
 Vcs-Git: git@github.com:tych0/xpyb-ng.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/xpybng.git;a=summary
 
 Package: python-xpybng
 Architecture: any

@@ -255,7 +255,7 @@ def _py_get_length_field(expr):
     '''
     if expr.lenfield_name != None:
         # This would be nicer if Request had an is_request attribute...
-        if hasattr(expr.parent.parent, "opcode"):
+        if hasattr(expr.parent, "parent") and hasattr(expr.parent.parent, "opcode"):
             return expr.lenfield_name
         else:
             return 'self.%s' % expr.lenfield_name
