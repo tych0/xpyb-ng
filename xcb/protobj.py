@@ -20,8 +20,8 @@ class Request(xcb.Protobj):
 
 class Response(xcb.Protobj):
     """XCB generic response object"""
-    def __init__(self, parent):
-        xcb.Protobj.__init__(self, parent)
+    def __init__(self, parent, offset):
+        xcb.Protobj.__init__(self, parent, offset)
         # self is a xcb_generic_event_t
         self.response_type, self.sequence = struct.unpack_from('BxH', self)
 
@@ -31,8 +31,8 @@ class Event(Response):
 
 class Reply(Response):
     """XCB generic reply object"""
-    def __init__(self, parent):
-        Response.__init__(self, parent)
+    def __init__(self, parent, offset):
+        Response.__init__(self, parent, offset)
         # self is a xcb_generic_reply_t
         (self.length, ) = struct.unpack_from('4xI', self)
 
