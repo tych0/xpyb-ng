@@ -13,7 +13,8 @@ class Union(xcb.Protobj):
 
 class Request(xcb.Protobj):
     def __init__(self, buffer, opcode, void, checked):
-        xcb.Protobj.__init__(self, buffer)
+        # buffer is always generated from a StringIO, so the offset is always 0
+        xcb.Protobj.__init__(self, buffer, 0)
         self.opcode = opcode
         self.is_void = void
         self.is_checked = checked
@@ -38,7 +39,7 @@ class Reply(Response):
 
 class Error(Response):
     """XCB generic error object"""
-    def __init__(self, parent):
-        Response.__init__(self, parent)
+    def __init__(self, parent, offset):
+        Response.__init__(self, parent, offset)
         # self is a xcb_generic_error_t
         (self.code, ) = struct.unpack_from('xB', self)
