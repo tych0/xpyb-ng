@@ -73,7 +73,7 @@ xpybEvent_create(xpybConn *conn, xcb_generic_event_t *e)
     if (shim == NULL)
         return NULL;
 
-    event = PyObject_CallFunctionObjArgs(type, shim, NULL);
+    event = PyObject_CallFunction(type, "Oi", shim, 0);
     Py_DECREF(shim);
     return event;
 }
